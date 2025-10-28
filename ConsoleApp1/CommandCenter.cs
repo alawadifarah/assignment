@@ -11,11 +11,19 @@ namespace ConsoleApp1
     {
         public string UserName { get; private set; } = "Guest";
         public bool IsOperational { get; private set; } = true;
-   
+        public int CommandProcessed { get; private set; } = 0;
+        private readonly Dictionary<string, ICommand> _commands;
+
         public CommandCenter()
         {
-            UserName = "Guest";
-            IsOperational = true;
+            _commands = new Dictionary<string, ICommand>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["help"] = new HelpCommand(),
+                ["status"] = new StatusCommand(),
+                ["set_name"] = new SetNameCommand(),
+                ["exit"] = new ExitCommand()
+
+            };
             
         }
 
@@ -27,41 +35,49 @@ namespace ConsoleApp1
             Console.WriteLine("set_name - Change your name");
             Console.WriteLine("exit - Close the program");
         }
-
+        public void ShowStatus()
+        {
+            Console.WriteLine("Command Center is Operational.");
+            Console.WriteLine("Current user: " + UserName);
+            Console.WriteLine("Commands processed: " + CommandProcessed);
+        }
+        public void SetUserName()
+        {      
+            Console.WriteLine("Enter new name: ");
+            var newName = Console.ReadLine();
+            if (!string.IsNullOrWhiteSpace(newName))
+            {
+                UserName = newName.Trim();
+                Console.WriteLine("Name updated! Hello " + UserName + ".");
+            }
+            
+        }
+        public void Exit()
+        {
+            Console.WriteLine("Goodbye! " + UserName + ".");
+            IsOperational = false;
+        }
         public void Run()
         {
             while (IsOperational)
             {
                 Console.WriteLine("Enter command or type 'help' for options. ");
-                string command = Console.ReadLine().ToLower();
-
-
-                switch (command)
+                var input = Console.ReadLine() ?? string.Empty;
+                if (_commands.TryGetValue(input, out var cmd))
                 {
-                    case "help":
-                        ShowHelp();
-                        break;
-                    case "status":
-                        Console.WriteLine("Command Center is Operational.");
-                        Console.WriteLine("Current user:" + UserName);
-                        break;
-                    case "set_name":
-                        Console.WriteLine("Enter new name: ");
-                        UserName = Console.ReadLine();
-                        Console.WriteLine("Name updated! Hello " + UserName + ".");
-                        break;
-                    case "exit":
-                        Console.WriteLine("Goodbye!" + UserName + ".");
-                        IsOperational = false;
-                        break;
-                    default:
-                        Console.WriteLine("invalid command. Type 'help' for options.");
-                        break;
+                    CommandProcessed++;
+                    cmd.Execute(this);
+                }
+                else
+                {
+                    Console.WriteLine("Invalid command. Type 'help' for options.");
+                }
+                   
                 }
 
             }
         }
 
     }
-}
+
 

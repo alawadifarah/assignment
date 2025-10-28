@@ -11,8 +11,9 @@ namespace assignmentPart1
     {
         static void Main(string[] args)
         {
-            
-            CommandCenter center = new CommandCenter();
+            Console.WriteLine("Starting Command Center...");
+            var center = new CommandCenter();
+
             center.Run();
 
         }
