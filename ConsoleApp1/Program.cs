@@ -8,7 +8,7 @@ namespace assignmentPart1
 {
      class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             string userName = "Guest";
 
@@ -52,6 +52,7 @@ namespace assignmentPart1
 
                 }
 
+            center.Run();
 
             }
         }
